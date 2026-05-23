@@ -11,7 +11,6 @@
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             height: 100vh;
             overflow: hidden;
-            transition: background 0.5s ease;
         }
 
         .center-container {
@@ -40,7 +39,6 @@
             box-shadow: 0 12px 32px rgba(0,0,0,0.10);
             width: 100%;
             max-width: 560px;
-            transition: all 0.3s ease;
         }
 
         .search-box input {
@@ -122,6 +120,7 @@
             height: 18px;
         }
 
+        /* 搜索结果 iframe（Bing） */
         .result-frame {
             display: none;
             position: fixed;
@@ -133,18 +132,16 @@
             z-index: 5;
         }
 
-        /* 自定义注入内容的样式 */
-        .custom-footer {
+        /* 自定义内容 iframe（全屏，无顶栏） */
+        .custom-frame {
+            display: none;
             position: fixed;
-            bottom: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 12px;
-            color: rgba(0,0,0,0.4);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
             z-index: 20;
-            opacity: 0;
-            transition: opacity 0.5s;
-            pointer-events: none;
         }
 
         @media (max-width: 600px) {
@@ -158,9 +155,10 @@
 </head>
 <body>
 
+    <!-- 默认搜索界面 -->
     <div class="center-container" id="centerContainer">
-        <div class="logo" id="mainLogo">极简搜索</div>
-        <div class="search-box" id="mainSearchBox">
+        <div class="logo">极简搜索</div>
+        <div class="search-box">
             <input type="text" id="mainInput" placeholder="输入关键词，回车搜索" autofocus>
             <button id="mainBtn" aria-label="搜索">
                 <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
@@ -168,6 +166,7 @@
         </div>
     </div>
 
+    <!-- 搜索后出现的顶栏 -->
     <div class="top-bar" id="topBar">
         <div class="mini-logo" id="homeBtn">极简搜索</div>
         <div class="search-box">
@@ -178,21 +177,48 @@
         </div>
     </div>
 
+    <!-- Bing 搜索结果 iframe -->
     <iframe class="result-frame" id="resultFrame" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
 
-    <!-- 可选的底部自定义文字，由 config.json 注入 -->
-    <div class="custom-footer" id="customFooter"></div>
+    <!-- 自定义内容 iframe -->
+    <iframe class="custom-frame" id="customFrame" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
 
     <script>
-        // --- 核心搜索逻辑 ---
         const centerContainer = document.getElementById('centerContainer');
         const topBar = document.getElementById('topBar');
         const resultFrame = document.getElementById('resultFrame');
+        const customFrame = document.getElementById('customFrame');
         const mainInput = document.getElementById('mainInput');
         const mainBtn = document.getElementById('mainBtn');
         const topInput = document.getElementById('topInput');
         const topBtn = document.getElementById('topBtn');
         const homeBtn = document.getElementById('homeBtn');
+
+        // 检测是否存在 custom.html
+        async function checkCustomFile() {
+            try {
+                const response = await fetch('./custom.html', { method: 'HEAD' });
+                if (response.ok) {
+                    // 存在：全屏显示 custom.html
+                    customFrame.src = './custom.html';
+                    customFrame.style.display = 'block';
+                    centerContainer.style.display = 'none';
+                    topBar.style.display = 'none';
+                    resultFrame.style.display = 'none';
+                } else {
+                    // 不存在：显示默认搜索界面
+                    showDefaultSearch();
+                }
+            } catch (e) {
+                // 网络错误或文件不存在，显示默认搜索界面
+                showDefaultSearch();
+            }
+        }
+
+        function showDefaultSearch() {
+            centerContainer.style.display = 'flex';
+            mainInput.focus();
+        }
 
         function performSearch(query) {
             const q = query.trim();
@@ -205,6 +231,7 @@
             centerContainer.style.display = 'none';
             topBar.style.display = 'flex';
             resultFrame.style.display = 'block';
+            customFrame.style.display = 'none';
 
             resultFrame.src = bingUrl;
         }
@@ -231,74 +258,8 @@
 
         homeBtn.addEventListener('click', resetToHome);
 
-        mainInput.focus();
-
-        // --- 自动检测并加载 config.json ---
-        (async function loadConfig() {
-            try {
-                const response = await fetch('./config.json');
-                if (!response.ok) return; // 文件不存在或读取失败，使用默认值
-                const config = await response.json();
-
-                // 1. 修改主标题
-                if (config.title) {
-                    document.title = config.title;
-                    document.getElementById('mainLogo').textContent = config.title;
-                    document.getElementById('homeBtn').textContent = config.title;
-                }
-
-                // 2. 修改占位符文字
-                if (config.placeholder) {
-                    mainInput.placeholder = config.placeholder;
-                    topInput.placeholder = config.placeholder;
-                }
-
-                // 3. 修改背景（支持颜色或渐变）
-                if (config.background) {
-                    document.body.style.background = config.background;
-                }
-
-                // 4. 修改搜索引擎地址（可替换为 Google 等）
-                //    此处通过闭包更新 performSearch 中的 url 变量
-                if (config.searchEngine) {
-                    // 重新定义搜索行为
-                    const originalPerformSearch = performSearch;
-                    performSearch = function(query) {
-                        const q = query.trim();
-                        if (!q) return;
-                        const url = config.searchEngine.replace('{query}', encodeURIComponent(q));
-
-                        mainInput.value = q;
-                        topInput.value = q;
-
-                        centerContainer.style.display = 'none';
-                        topBar.style.display = 'flex';
-                        resultFrame.style.display = 'block';
-
-                        resultFrame.src = url;
-                    };
-                }
-
-                // 5. 注入自定义底部文字
-                if (config.footerText) {
-                    const footer = document.getElementById('customFooter');
-                    footer.textContent = config.footerText;
-                    footer.style.opacity = '1';
-                }
-
-                // 6. 可扩展：自定义 CSS 变量等
-                if (config.customCSS) {
-                    const style = document.createElement('style');
-                    style.textContent = config.customCSS;
-                    document.head.appendChild(style);
-                }
-
-                console.log('配置文件加载成功');
-            } catch (e) {
-                // 解析错误等，忽略
-                console.warn('config.json 加载或解析失败，使用默认设置', e);
-            }
-        })();
+        // 页面加载时立即检测自定义文件
+        checkCustomFile();
     </script>
 </body>
 </html>
