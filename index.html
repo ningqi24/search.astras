@@ -10,99 +10,295 @@
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             height: 100vh;
+            overflow: hidden;
+            transition: background 0.5s ease;
+        }
+
+        .center-container {
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            transition: all 0.3s ease;
         }
-        .header {
-            text-align: center;
-            padding: 30px 20px 10px;
-        }
+
         .logo {
-            font-size: 36px;
+            font-size: 42px;
             font-weight: 700;
-            margin-bottom: 18px;
             color: #1e1e1e;
+            letter-spacing: -1px;
+            margin-bottom: 28px;
         }
+
         .search-box {
             display: flex;
-            background: rgba(255,255,255,0.9);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
             border-radius: 40px;
             padding: 7px 7px 7px 20px;
-            max-width: 540px;
-            margin: 0 auto;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-        }
-        .search-box input {
-            flex: 1; border: none; background: transparent; font-size: 16px;
-            padding: 10px 4px; outline: none;
-        }
-        .search-box button {
-            background: transparent; border: none; cursor: pointer;
-            padding: 0 16px; border-radius: 50%; width: 44px; height: 44px;
-        }
-        .search-box button svg { width: 20px; height: 20px; fill: #5f6368; }
-        #resultFrame {
-            flex: 1;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.10);
             width: 100%;
-            border: none;
-            display: none; /* 先隐藏，搜索后再显示 */
+            max-width: 560px;
+            transition: all 0.3s ease;
         }
-        .fallback {
-            text-align: center;
-            padding: 40px;
-            color: #555;
+
+        .search-box input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 17px;
+            padding: 12px 4px;
+            outline: none;
+            color: #111;
+        }
+
+        .search-box button {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0 16px;
+            border-radius: 50%;
+            width: 46px;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-box button:hover { background: rgba(0,0,0,0.05); }
+
+        .search-box button svg {
+            width: 22px;
+            height: 22px;
+            fill: #5f6368;
+        }
+
+        .top-bar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            z-index: 10;
+            padding: 8px 20px;
+            align-items: center;
+        }
+
+        .top-bar .mini-logo {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1e1e1e;
+            margin-right: 16px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .top-bar .search-box {
+            flex: 1;
+            max-width: 500px;
+            padding: 5px 5px 5px 14px;
+            box-shadow: none;
+            background: #f1f3f4;
+        }
+
+        .top-bar .search-box input {
+            font-size: 15px;
+            padding: 8px 0;
+        }
+
+        .top-bar .search-box button {
+            width: 38px;
+            height: 38px;
+            padding: 0 10px;
+        }
+
+        .top-bar .search-box button svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .result-frame {
+            display: none;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 100%;
+            height: calc(100vh - 60px);
+            border: none;
+            z-index: 5;
+        }
+
+        /* 自定义注入内容的样式 */
+        .custom-footer {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: rgba(0,0,0,0.4);
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+        }
+
+        @media (max-width: 600px) {
+            .logo { font-size: 32px; margin-bottom: 20px; }
+            .search-box { max-width: 90%; }
+            .top-bar { padding: 8px 12px; }
+            .top-bar .mini-logo { font-size: 16px; margin-right: 8px; }
+            .top-bar .search-box { max-width: 100%; }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo">🔍 极简搜索</div>
-        <div class="search-box" id="searchBox">
-            <input type="text" id="queryInput" placeholder="输入关键词，回车搜索" autofocus>
-            <button id="searchBtn" aria-label="搜索">
+
+    <div class="center-container" id="centerContainer">
+        <div class="logo" id="mainLogo">极简搜索</div>
+        <div class="search-box" id="mainSearchBox">
+            <input type="text" id="mainInput" placeholder="输入关键词，回车搜索" autofocus>
+            <button id="mainBtn" aria-label="搜索">
                 <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
             </button>
         </div>
     </div>
-    <iframe id="resultFrame" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
-    <div class="fallback" id="fallbackMsg" style="display:none;">
-        无法加载嵌入式结果，请<a href="#" id="directLink" target="_blank">在新窗口中查看</a>。
+
+    <div class="top-bar" id="topBar">
+        <div class="mini-logo" id="homeBtn">极简搜索</div>
+        <div class="search-box">
+            <input type="text" id="topInput" placeholder="继续搜索...">
+            <button id="topBtn" aria-label="搜索">
+                <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            </button>
+        </div>
     </div>
 
-    <script>
-        const iframe = document.getElementById('resultFrame');
-        const fallback = document.getElementById('fallbackMsg');
-        const directLink = document.getElementById('directLink');
-        const input = document.getElementById('queryInput');
-        const button = document.getElementById('searchBtn');
+    <iframe class="result-frame" id="resultFrame" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
 
-        function doSearch() {
-            const query = input.value.trim();
-            if (!query) return;
-            const bingUrl = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
-            directLink.href = bingUrl;
-            // 尝试加载 iframe
-            iframe.src = bingUrl;
-            iframe.style.display = 'block';
-            fallback.style.display = 'none';
-            // 监听 iframe 加载错误（可能因 X-Frame-Options 被阻止）
-            iframe.onerror = () => {
-                iframe.style.display = 'none';
-                fallback.style.display = 'block';
-            };
-            // 如果 5 秒后 iframe 仍为空白，视为被阻止
-            setTimeout(() => {
-                if (iframe.contentDocument && iframe.contentDocument.body && iframe.contentDocument.body.innerHTML === '') {
-                    iframe.style.display = 'none';
-                    fallback.style.display = 'block';
-                }
-            }, 5000);
+    <!-- 可选的底部自定义文字，由 config.json 注入 -->
+    <div class="custom-footer" id="customFooter"></div>
+
+    <script>
+        // --- 核心搜索逻辑 ---
+        const centerContainer = document.getElementById('centerContainer');
+        const topBar = document.getElementById('topBar');
+        const resultFrame = document.getElementById('resultFrame');
+        const mainInput = document.getElementById('mainInput');
+        const mainBtn = document.getElementById('mainBtn');
+        const topInput = document.getElementById('topInput');
+        const topBtn = document.getElementById('topBtn');
+        const homeBtn = document.getElementById('homeBtn');
+
+        function performSearch(query) {
+            const q = query.trim();
+            if (!q) return;
+            const bingUrl = `https://www.bing.com/search?q=${encodeURIComponent(q)}`;
+
+            mainInput.value = q;
+            topInput.value = q;
+
+            centerContainer.style.display = 'none';
+            topBar.style.display = 'flex';
+            resultFrame.style.display = 'block';
+
+            resultFrame.src = bingUrl;
         }
 
-        button.addEventListener('click', doSearch);
-        input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') doSearch();
+        function resetToHome() {
+            centerContainer.style.display = 'flex';
+            topBar.style.display = 'none';
+            resultFrame.style.display = 'none';
+            resultFrame.src = '';
+            mainInput.value = '';
+            topInput.value = '';
+            mainInput.focus();
+        }
+
+        mainBtn.addEventListener('click', () => performSearch(mainInput.value));
+        mainInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performSearch(mainInput.value);
         });
+
+        topBtn.addEventListener('click', () => performSearch(topInput.value));
+        topInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performSearch(topInput.value);
+        });
+
+        homeBtn.addEventListener('click', resetToHome);
+
+        mainInput.focus();
+
+        // --- 自动检测并加载 config.json ---
+        (async function loadConfig() {
+            try {
+                const response = await fetch('./config.json');
+                if (!response.ok) return; // 文件不存在或读取失败，使用默认值
+                const config = await response.json();
+
+                // 1. 修改主标题
+                if (config.title) {
+                    document.title = config.title;
+                    document.getElementById('mainLogo').textContent = config.title;
+                    document.getElementById('homeBtn').textContent = config.title;
+                }
+
+                // 2. 修改占位符文字
+                if (config.placeholder) {
+                    mainInput.placeholder = config.placeholder;
+                    topInput.placeholder = config.placeholder;
+                }
+
+                // 3. 修改背景（支持颜色或渐变）
+                if (config.background) {
+                    document.body.style.background = config.background;
+                }
+
+                // 4. 修改搜索引擎地址（可替换为 Google 等）
+                //    此处通过闭包更新 performSearch 中的 url 变量
+                if (config.searchEngine) {
+                    // 重新定义搜索行为
+                    const originalPerformSearch = performSearch;
+                    performSearch = function(query) {
+                        const q = query.trim();
+                        if (!q) return;
+                        const url = config.searchEngine.replace('{query}', encodeURIComponent(q));
+
+                        mainInput.value = q;
+                        topInput.value = q;
+
+                        centerContainer.style.display = 'none';
+                        topBar.style.display = 'flex';
+                        resultFrame.style.display = 'block';
+
+                        resultFrame.src = url;
+                    };
+                }
+
+                // 5. 注入自定义底部文字
+                if (config.footerText) {
+                    const footer = document.getElementById('customFooter');
+                    footer.textContent = config.footerText;
+                    footer.style.opacity = '1';
+                }
+
+                // 6. 可扩展：自定义 CSS 变量等
+                if (config.customCSS) {
+                    const style = document.createElement('style');
+                    style.textContent = config.customCSS;
+                    document.head.appendChild(style);
+                }
+
+                console.log('配置文件加载成功');
+            } catch (e) {
+                // 解析错误等，忽略
+                console.warn('config.json 加载或解析失败，使用默认设置', e);
+            }
+        })();
     </script>
 </body>
 </html>
