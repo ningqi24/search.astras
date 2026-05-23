@@ -1,0 +1,8 @@
+{
+  "title": "我的搜索",
+  "placeholder": "搜点什么...",
+  "background": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+  "searchEngine": "https://www.google.com/search?q={query}",
+  "footerText": "由 GitHub Pages 驱动",
+  "customCSS": ".logo { color: #fff; }"
+}
