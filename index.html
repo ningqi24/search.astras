@@ -5,103 +5,104 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>极简搜索</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            /* 也可换成单色：#f0f2f5 */
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-        .container {
+        .header {
             text-align: center;
-            width: 100%;
-            max-width: 560px;
-            padding: 0 20px;
-            margin-top: -8vh;
+            padding: 30px 20px 10px;
         }
         .logo {
-            font-size: 48px;
+            font-size: 36px;
             font-weight: 700;
+            margin-bottom: 18px;
             color: #1e1e1e;
-            letter-spacing: -1px;
-            margin-bottom: 28px;
         }
         .search-box {
             display: flex;
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(12px);
+            background: rgba(255,255,255,0.9);
             border-radius: 40px;
             padding: 7px 7px 7px 20px;
-            box-shadow: 0 12px 32px rgba(0,0,0,0.10);
-            transition: box-shadow 0.2s, background 0.2s;
-        }
-        .search-box:focus-within {
-            background: #ffffff;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            max-width: 540px;
+            margin: 0 auto;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
         }
         .search-box input {
-            flex: 1;
-            border: none;
-            background: transparent;
-            font-size: 17px;
-            padding: 12px 4px;
-            outline: none;
-            color: #111;
-        }
-        .search-box input::placeholder {
-            color: #777;
+            flex: 1; border: none; background: transparent; font-size: 16px;
+            padding: 10px 4px; outline: none;
         }
         .search-box button {
-            background: transparent;
+            background: transparent; border: none; cursor: pointer;
+            padding: 0 16px; border-radius: 50%; width: 44px; height: 44px;
+        }
+        .search-box button svg { width: 20px; height: 20px; fill: #5f6368; }
+        #resultFrame {
+            flex: 1;
+            width: 100%;
             border: none;
-            cursor: pointer;
-            padding: 0 16px;
-            border-radius: 50%;
-            width: 46px;
-            height: 46px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
+            display: none; /* 先隐藏，搜索后再显示 */
         }
-        .search-box button:hover {
-            background: rgba(0,0,0,0.05);
-        }
-        .search-box button svg {
-            width: 22px;
-            height: 22px;
-            fill: #5f6368;
-        }
-        .footer {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 12px;
-            color: rgba(0,0,0,0.5);
-            white-space: nowrap;
+        .fallback {
+            text-align: center;
+            padding: 40px;
+            color: #555;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="logo">极简搜索</div>
-        <form action="https://www.bing.com/search" method="get" target="_blank">
-            <div class="search-box">
-                <input type="text" name="q" placeholder="输入关键词，回车搜索" autofocus>
-                <button type="submit" aria-label="搜索">
-                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-                </button>
-            </div>
-        </form>
+    <div class="header">
+        <div class="logo">🔍 极简搜索</div>
+        <div class="search-box" id="searchBox">
+            <input type="text" id="queryInput" placeholder="输入关键词，回车搜索" autofocus>
+            <button id="searchBtn" aria-label="搜索">
+                <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            </button>
+        </div>
     </div>
-    <div class="footer">搜索由 Bing 提供</div>
+    <iframe id="resultFrame" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
+    <div class="fallback" id="fallbackMsg" style="display:none;">
+        无法加载嵌入式结果，请<a href="#" id="directLink" target="_blank">在新窗口中查看</a>。
+    </div>
+
+    <script>
+        const iframe = document.getElementById('resultFrame');
+        const fallback = document.getElementById('fallbackMsg');
+        const directLink = document.getElementById('directLink');
+        const input = document.getElementById('queryInput');
+        const button = document.getElementById('searchBtn');
+
+        function doSearch() {
+            const query = input.value.trim();
+            if (!query) return;
+            const bingUrl = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
+            directLink.href = bingUrl;
+            // 尝试加载 iframe
+            iframe.src = bingUrl;
+            iframe.style.display = 'block';
+            fallback.style.display = 'none';
+            // 监听 iframe 加载错误（可能因 X-Frame-Options 被阻止）
+            iframe.onerror = () => {
+                iframe.style.display = 'none';
+                fallback.style.display = 'block';
+            };
+            // 如果 5 秒后 iframe 仍为空白，视为被阻止
+            setTimeout(() => {
+                if (iframe.contentDocument && iframe.contentDocument.body && iframe.contentDocument.body.innerHTML === '') {
+                    iframe.style.display = 'none';
+                    fallback.style.display = 'block';
+                }
+            }, 5000);
+        }
+
+        button.addEventListener('click', doSearch);
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') doSearch();
+        });
+    </script>
 </body>
 </html>
