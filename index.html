@@ -120,7 +120,6 @@
             height: 18px;
         }
 
-        /* 搜索结果 iframe（Bing） */
         .result-frame {
             display: none;
             position: fixed;
@@ -130,18 +129,6 @@
             height: calc(100vh - 60px);
             border: none;
             z-index: 5;
-        }
-
-        /* 自定义内容 iframe（全屏，无顶栏） */
-        .custom-frame {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-            z-index: 20;
         }
 
         @media (max-width: 600px) {
@@ -155,7 +142,6 @@
 </head>
 <body>
 
-    <!-- 默认搜索界面 -->
     <div class="center-container" id="centerContainer">
         <div class="logo">极简搜索</div>
         <div class="search-box">
@@ -166,7 +152,6 @@
         </div>
     </div>
 
-    <!-- 搜索后出现的顶栏 -->
     <div class="top-bar" id="topBar">
         <div class="mini-logo" id="homeBtn">极简搜索</div>
         <div class="search-box">
@@ -177,48 +162,17 @@
         </div>
     </div>
 
-    <!-- Bing 搜索结果 iframe -->
     <iframe class="result-frame" id="resultFrame" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
-
-    <!-- 自定义内容 iframe -->
-    <iframe class="custom-frame" id="customFrame" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
 
     <script>
         const centerContainer = document.getElementById('centerContainer');
         const topBar = document.getElementById('topBar');
         const resultFrame = document.getElementById('resultFrame');
-        const customFrame = document.getElementById('customFrame');
         const mainInput = document.getElementById('mainInput');
         const mainBtn = document.getElementById('mainBtn');
         const topInput = document.getElementById('topInput');
         const topBtn = document.getElementById('topBtn');
         const homeBtn = document.getElementById('homeBtn');
-
-        // 检测是否存在 custom.html
-        async function checkCustomFile() {
-            try {
-                const response = await fetch('./custom.html', { method: 'HEAD' });
-                if (response.ok) {
-                    // 存在：全屏显示 custom.html
-                    customFrame.src = './custom.html';
-                    customFrame.style.display = 'block';
-                    centerContainer.style.display = 'none';
-                    topBar.style.display = 'none';
-                    resultFrame.style.display = 'none';
-                } else {
-                    // 不存在：显示默认搜索界面
-                    showDefaultSearch();
-                }
-            } catch (e) {
-                // 网络错误或文件不存在，显示默认搜索界面
-                showDefaultSearch();
-            }
-        }
-
-        function showDefaultSearch() {
-            centerContainer.style.display = 'flex';
-            mainInput.focus();
-        }
 
         function performSearch(query) {
             const q = query.trim();
@@ -231,7 +185,6 @@
             centerContainer.style.display = 'none';
             topBar.style.display = 'flex';
             resultFrame.style.display = 'block';
-            customFrame.style.display = 'none';
 
             resultFrame.src = bingUrl;
         }
@@ -258,8 +211,7 @@
 
         homeBtn.addEventListener('click', resetToHome);
 
-        // 页面加载时立即检测自定义文件
-        checkCustomFile();
+        mainInput.focus();
     </script>
 </body>
 </html>
