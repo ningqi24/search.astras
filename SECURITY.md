@@ -14,7 +14,7 @@
 1. **GitHub Security Advisories**（推荐）：
    - 访问仓库 → Security → Advisories → New draft security advisory
 
-2. **邮箱**：security@astras-search.example（请替换为真实邮箱）
+2. **邮箱**：ningqi@astras.cc
 
 **请勿**在公开的 Issue 或 Discussion 中报告安全漏洞。
 
