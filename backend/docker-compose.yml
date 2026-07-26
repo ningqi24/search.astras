@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  astras-backend:
+    build: .
+    container_name: astras-search-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - ALLOWED_ORIGINS=https://search.astras.example
+      # 从 .env 文件加载
+    env_file:
+      - .env
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    networks:
+      - astras-network
+
+  # 可选：Nginx 反向代理
+  nginx:
+    image: nginx:alpine
+    container_name: astras-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - astras-backend
+    restart: unless-stopped
+    networks:
+      - astras-network
+
+networks:
+  astras-network:
+    driver: bridge

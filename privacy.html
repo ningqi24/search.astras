@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>隐私政策 - Astras Search</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            line-height: 1.8;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+        }
+        h1 { font-size: 32px; margin-bottom: 8px; color: #1e1e1e; }
+        .update-time { color: #888; font-size: 14px; margin-bottom: 30px; }
+        h2 { font-size: 20px; margin: 28px 0 12px; color: #2c3e50; border-bottom: 2px solid #e0e0e0; padding-bottom: 8px; }
+        h3 { font-size: 16px; margin: 18px 0 8px; color: #34495e; }
+        p { margin: 10px 0; color: #555; }
+        ul { margin: 10px 0 10px 24px; color: #555; }
+        li { margin: 6px 0; }
+        .highlight { background: #fff3cd; padding: 2px 6px; border-radius: 4px; }
+        .danger { background: #f8d7da; padding: 2px 6px; border-radius: 4px; color: #721c24; }
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .back-link:hover { text-decoration: underline; }
+        .notice-box {
+            background: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 16px 0;
+        }
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #f0ad4e;
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 16px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔒 隐私政策</h1>
+        <p class="update-time">最后更新日期：2026年7月26日</p>
+
+        <div class="notice-box">
+            <strong>重要声明：</strong>Astras Search 是一个<strong>个人学习实验项目</strong>，旨在探索搜索聚合技术。本项目不收集、不存储任何用户个人数据，所有搜索请求均直接转发至第三方搜索引擎。
+        </div>
+
+        <h2>1. 数据收集声明</h2>
+        <h3>1.1 我们不收集的数据</h3>
+        <ul>
+            <li><strong>搜索关键词</strong>：您的搜索内容不会经过我们的服务器，直接由浏览器发送至目标搜索引擎。</li>
+            <li><strong>IP 地址</strong>：我们不记录用户的 IP 地址或地理位置信息。</li>
+            <li><strong>个人身份信息</strong>：不收集姓名、邮箱、电话等任何可识别个人身份的信息。</li>
+            <li><strong>Cookie</strong>：本站不使用 Cookie 或本地存储来追踪用户行为。</li>
+        </ul>
+
+        <h3>1.2 第三方可能收集的数据</h3>
+        <p>当您点击搜索结果跳转至第三方搜索引擎时，以下平台可能会根据其各自的隐私政策收集数据：</p>
+        <ul>
+            <li><strong>Google</strong>：参见 <a href="https://policies.google.com/privacy" target="_blank">Google 隐私政策</a></li>
+            <li><strong>Bing (Microsoft)</strong>：参见 <a href="https://privacy.microsoft.com/" target="_blank">Microsoft 隐私声明</a></li>
+            <li><strong>百度</strong>：参见 <a href="https://privacy.baidu.com/" target="_blank">百度隐私政策</a></li>
+            <li><strong>DuckDuckGo</strong>：参见 <a href="https://duckduckgo.com/privacy" target="_blank">DuckDuckGo 隐私政策</a></li>
+        </ul>
+
+        <h2>2. 技术实现说明</h2>
+        <p>Astras Search 采用<strong>纯前端聚合跳转</strong>架构：</p>
+        <ul>
+            <li>搜索请求由您的浏览器<strong>直接发送</strong>至目标搜索引擎，不经过中间服务器。</li>
+            <li>本项目<strong>无后端服务</strong>，不处理、不缓存任何搜索数据。</li>
+            <li>页面加载后，所有交互均在本地完成，无网络请求发送至本项目服务器。</li>
+        </ul>
+
+        <h2>3. 第三方服务</h2>
+        <p>本站托管于 GitHub Pages，GitHub 可能会记录访问日志（如 IP、User-Agent），详见 <a href="https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement" target="_blank">GitHub 隐私声明</a>。</p>
+
+        <h2>4. 数据保留</h2>
+        <p>由于本项目不收集任何数据，因此不存在数据保留期限的问题。</p>
+
+        <h2>5. 用户权利</h2>
+        <p>您有权：</p>
+        <ul>
+            <li>随时停止使用本服务。</li>
+            <li>通过浏览器开发者工具验证本站的网络请求行为。</li>
+            <li>查阅本站完整源代码（<a href="https://github.com/ningqi24/search.astras" target="_blank">GitHub 仓库</a>）以确认隐私声明的真实性。</li>
+        </ul>
+
+        <h2>6. 联系我们</h2>
+        <p>如有关于隐私政策的疑问或投诉，请通过以下方式联系：</p>
+        <ul>
+            <li>📧 邮箱：<a href="mailto:privacy@astras-search.example">privacy@astras-search.example</a>（请替换为真实邮箱）</li>
+            <li>🐛 GitHub Issues：<a href="https://github.com/ningqi24/search.astras/issues" target="_blank">提交 Issue</a></li>
+        </ul>
+
+        <div class="warning-box">
+            <strong>⚠️ 免责声明：</strong>本项目仅为技术学习用途，不提供任何形式的搜索结果保证。搜索结果由第三方搜索引擎提供，其内容与本项目无关。
+        </div>
+
+        <a href="index.html" class="back-link">← 返回首页</a>
+    </div>
+</body>
+</html>

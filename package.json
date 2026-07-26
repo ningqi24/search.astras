@@ -1,0 +1,17 @@
+{
+  "name": "astras-search",
+  "version": "2.0.0",
+  "description": "Astras Search - 聚合多引擎极简搜索",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:report": "playwright show-report",
+    "serve": "python -m http.server 8080"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0"
+  },
+  "keywords": ["search", "aggregate", "frontend"],
+  "author": "ningqi24",
+  "license": "MIT"
+}
